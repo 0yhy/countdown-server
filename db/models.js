@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const url = "mongodb://localhost:27017/countdown";
-mongoose.connect(url);
-const conn = mongoose.connection;
-conn.on("connected", () => {
-  console.log("succeeded in connecting with mongodb");
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, res) => {
+  if (!err) {
+    console.log("succeeded in connecting with mongodb");
+  }
 });
 
 const countdownSchema = mongoose.Schema({
@@ -12,6 +12,7 @@ const countdownSchema = mongoose.Schema({
   start_date: { type: String, required: true },
   end_date: { type: String, required: true },
   total: { type: Number, required: true },
+  openid: { type: String, required: true },
 });
 
 const CountdownModel = mongoose.model("countdown", countdownSchema);
