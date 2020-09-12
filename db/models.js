@@ -14,9 +14,15 @@ const countdownSchema = mongoose.Schema({
   total: { type: Number, required: true },
   openid: { type: String, required: true },
 });
+const adviceSchema = mongoose.Schema({
+  openid: { type: String, required: true },
+  advice: { type: String, required: true },
+});
 
 const CountdownModel = mongoose.model("countdown", countdownSchema);
+const AdviceSchema = mongoose.model("advice", adviceSchema);
 
 module.exports = {
   CountdownModel,
+  AdviceSchema,
 };

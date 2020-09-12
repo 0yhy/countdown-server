@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const { tokenSecret } = require("../keys/token");
 const { AppId, AppSecret } = require("../keys/config");
 const { verifyToken } = require("../middleware/verifyToken");
-const { CountdownModel } = require("../db/models");
+const { CountdownModel, AdviceSchema } = require("../db/models");
 const { calcDateDiff } = require("../utils/calcDateDiff");
 
 const router = express.Router();
@@ -84,11 +84,8 @@ router.post("/countdown", verifyToken, function (req, res, next) {
 // 修改倒计时
 router.put("/countdown", verifyToken, function (req, res, next) {
   const modifiedData = req.body;
-  if (modifiedData.start_date) {
-    const { start_date, end_date } = modifiedData;
-    modifiedData.total = calcDateDiff(start_date, end_date);
-  }
-  console.log(modifiedData);
+  const { start_date, end_date } = modifiedData;
+  modifiedData.total = calcDateDiff(start_date, end_date);
   CountdownModel.updateOne({ _id: modifiedData._id }, modifiedData, (err, doc) => {
     if (err) {
       res.send({ code: 1, data: err });
@@ -101,6 +98,19 @@ router.put("/countdown", verifyToken, function (req, res, next) {
 router.delete("/countdown", verifyToken, function (req, res, next) {
   const { _id } = req.body;
   CountdownModel.deleteOne({ _id: _id }, (err, doc) => {
+    if (err) {
+      res.send({ code: 1, data: err });
+    } else {
+      res.send({ code: 0, data: null });
+    }
+  });
+});
+// 反馈与意见
+router.post("/advice", verifyToken, function (req, res, next) {
+  const { openid } = req.payload;
+  const { advice } = req.body;
+  const newAdvice = { openid: openid, advice: advice };
+  new AdviceSchema(newAdvice).save((err, doc) => {
     if (err) {
       res.send({ code: 1, data: err });
     } else {
